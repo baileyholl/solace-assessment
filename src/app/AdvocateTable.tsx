@@ -1,48 +1,84 @@
+import {Advocate} from "@/app/types/model";
+import {nanoid} from "nanoid";
 import React from "react";
 
-function formatPhoneNumber(phoneNumberString) {
-    var cleaned = ('' + phoneNumberString).replace(/\D/g, '');
-    var match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
+function formatPhoneNumber(phoneNumberString: string): string | undefined {
+    const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+    const match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
     if (match) {
-        var intlCode = (match[1] ? '+1 ' : '');
+        const intlCode = (match[1] ? '+1 ' : '');
         return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('');
     }
-    return null;
 }
 
-const AdvocateTable = ({ advocates }) => {
+const AdvocateCard = ({advocate}: { advocate: Advocate }) => {
     return (
-        <div className="overflow-x-auto">
-            <table className="w-full table-auto border-collapse text-sm">
-                <thead className="table-header bg-gray-100">
-                <tr>
-                    <th>Name</th>
-                    <th>City</th>
-                    <th>Specialties</th>
-                    <th>Experience</th>
-                    <th>Phone</th>
-                </tr>
-                </thead>
-                <tbody>
-                {advocates.map((advocate, index) => (
-                    <tr key={index} className="table-row border-b hover:bg-gray-50">
-                        <td>{`${advocate.firstName} ${advocate.lastName}${advocate.degree ? `, ${advocate.degree}` : ''}`}</td>
-                        <td>{advocate.city}</td>
-                        <td>
-                            <ul className="list-disc list-inside space-y-1">
-                                {advocate.specialties.map((s, i) => (
-                                    <li key={i}>{s}</li>
-                                ))}
-                            </ul>
-                        </td>
-                        <td>{advocate.yearsOfExperience} yrs</td>
-                        <td>{formatPhoneNumber(advocate.phoneNumber)}</td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+        <div className="border-b py-6 md:flex md:gap-6">
+            {/*Replace with an image provided by the advocate object from backend*/}
+            <img
+                src={Math.random() > 0.5 ?
+                    "https://media.istockphoto.com/id/1399565382/photo/young-happy-mixed-race-businessman-standing-with-his-arms-crossed-working-alone-in-an-office.webp?s=2048x2048&w=is&k=20&c=YmjrR4r6G_4XUliPPK3PPLHrkqKLvSY2D3ZEQewLZ38="
+                    : "https://media.istockphoto.com/id/1587604256/photo/portrait-lawyer-and-black-woman-with-tablet-smile-and-happy-in-office-workplace-african.webp?s=2048x2048&w=is&k=20&c=Bb8faonUUWuL0KlV0VQh0-yQLzWECQVzg5zs9KcPt_Y="}
+                alt={`${advocate.firstName} ${advocate.lastName}`}
+                className="w-28 h-28 object-cover rounded-md mb-4 md:mb-0"
+            />
+
+            <div className="flex-1">
+                <div className="flex justify-between items-start flex-wrap gap-2">
+                    <h2 className="text-xl font-bold ">
+                        {advocate.firstName} {advocate.lastName}
+                        {advocate.degree && `, ${advocate.degree}`}
+                    </h2>
+                </div>
+
+                <p className="text-gray-800 mt-1">
+                    {advocate.specialties.join(", ")}
+                </p>
+
+                <div className="mt-4 flex flex-col sm:flex-row gap-6 text-sm">
+                    <div>
+                        <div className="font-semibold">Patient Rating</div>
+                        <div className="text-gray-600">No reviews</div>
+                        <div className="mt-1 font-semibold">
+                            Employed by Solace Health
+                        </div>
+                        <div className="mt-2 font-semibold">
+                            <a
+                                href={`tel:${advocate.phoneNumber}`}
+                                className="text-teal-600 font-semibold hover:underline"
+                            >
+                                {formatPhoneNumber(advocate.phoneNumber)}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div className="font-semibold">Location</div>
+                        <div>{advocate.city}</div>
+                        <div className="mt-1 text-gray-700">
+                            {advocate.yearsOfExperience} years experience
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
+};
+
+const AdvocateTable = ({advocates}: { advocates: Advocate[] }) => {
+    return (
+        <div>
+            <h2 className="text-lg font-semibold mb-4 text-gray-700">
+                Available Advocates
+            </h2>
+            <div className="space-y-8">
+                {advocates.map((advocate, index) => (
+                    // COMMENT: Typically we would use the unique ID of the advocate from our database as the KEY prop, but our base model does not have it for this PR.
+                    // First + last + Phone number is unique enough for this prototype.
+                    <AdvocateCard key={advocate.firstName + advocate.lastName + advocate.phoneNumber} advocate={advocate}/>
+                ))}
+            </div>
+        </div>)
 };
 
 export default AdvocateTable;
