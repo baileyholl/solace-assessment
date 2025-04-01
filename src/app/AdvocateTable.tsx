@@ -16,9 +16,7 @@ const AdvocateCard = ({advocate}: { advocate: Advocate }) => {
         <div className="border-b py-6 md:flex md:gap-6">
             {/*Replace with an image provided by the advocate object from backend*/}
             <img
-                src={Math.random() > 0.5 ?
-                    "https://media.istockphoto.com/id/1399565382/photo/young-happy-mixed-race-businessman-standing-with-his-arms-crossed-working-alone-in-an-office.webp?s=2048x2048&w=is&k=20&c=YmjrR4r6G_4XUliPPK3PPLHrkqKLvSY2D3ZEQewLZ38="
-                    : "https://media.istockphoto.com/id/1587604256/photo/portrait-lawyer-and-black-woman-with-tablet-smile-and-happy-in-office-workplace-african.webp?s=2048x2048&w=is&k=20&c=Bb8faonUUWuL0KlV0VQh0-yQLzWECQVzg5zs9KcPt_Y="}
+                src={"https://media.istockphoto.com/id/1587604256/photo/portrait-lawyer-and-black-woman-with-tablet-smile-and-happy-in-office-workplace-african.webp?s=2048x2048&w=is&k=20&c=Bb8faonUUWuL0KlV0VQh0-yQLzWECQVzg5zs9KcPt_Y="}
                 alt={`${advocate.firstName} ${advocate.lastName}`}
                 className="w-28 h-28 object-cover rounded-md mb-4 md:mb-0"
             />
