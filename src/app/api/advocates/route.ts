@@ -30,16 +30,17 @@ export async function GET(request: Request): Promise<Response> {
           OR s2.name ILIKE ${`%${searchTerm}%`}
       )
     ` : sql``
+    // Since Drizzle does not support aggregated selections, unfortunately we have to use raw SQL here
     const results = await db.execute(
         sql`
             SELECT
                 a.id,
-                a.first_name,
-                a.last_name,
+                a.first_name as "firstName",
+                a.last_name as "lastName",
                 a.city,
                 a.degree,
-                a.years_of_experience,
-                a.phone_number,
+                a.years_of_experience as "yearsOfExperience",
+                a.phone_number as "phoneNumber",
                 array_agg(DISTINCT s.name) AS specialties
             FROM advocates a
                      LEFT JOIN advocate_specialties asp ON asp.advocate_id = a.id

@@ -1,5 +1,4 @@
 import {Advocate} from "@/app/types/model";
-import {nanoid} from "nanoid";
 import React from "react";
 
 function formatPhoneNumber(phoneNumberString: string): string | undefined {
@@ -14,7 +13,7 @@ function formatPhoneNumber(phoneNumberString: string): string | undefined {
 const AdvocateCard = ({advocate}: { advocate: Advocate }) => {
     return (
         <div className="border-b py-6 md:flex md:gap-6">
-            {/*Replace with an image provided by the advocate object from backend*/}
+            {/*Could be replaced with an image provided by the advocate object from backend*/}
             <img
                 src={"https://media.istockphoto.com/id/1587604256/photo/portrait-lawyer-and-black-woman-with-tablet-smile-and-happy-in-office-workplace-african.webp?s=2048x2048&w=is&k=20&c=Bb8faonUUWuL0KlV0VQh0-yQLzWECQVzg5zs9KcPt_Y="}
                 alt={`${advocate.firstName} ${advocate.lastName}`}
@@ -70,10 +69,8 @@ const AdvocateTable = ({advocates}: { advocates: Advocate[] }) => {
                 Available Advocates
             </h2>
             <div className="space-y-8">
-                {advocates.map((advocate, index) => (
-                    // COMMENT: Typically we would use the unique ID of the advocate from our database as the KEY prop, but our base model does not have it for this PR.
-                    // First + last + Phone number is unique enough for this prototype.
-                    <AdvocateCard key={advocate.firstName + advocate.lastName + advocate.phoneNumber} advocate={advocate}/>
+                {advocates.map((advocate: Advocate, index) => (
+                    <AdvocateCard key={advocate.id} advocate={advocate}/>
                 ))}
             </div>
         </div>)
