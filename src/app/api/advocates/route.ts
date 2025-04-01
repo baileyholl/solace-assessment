@@ -12,12 +12,15 @@ export async function GET(request: Request): Promise<Response> {
     const limit = Math.min(parseInt(searchParams.get("limit") || "", 10) || defaultPageSize, maxPageSize);
 
     const shouldFilter = !!searchTerm?.trim();
+
     let lastIdFilter = sql``
     if(lastId && shouldFilter){
         lastIdFilter = sql`AND a.id > ${Number(lastId)}`
     }else if(lastId){
         lastIdFilter = sql`WHERE a.id > ${Number(lastId)}`
     }
+    // If a search term is provided, we search the joined advocate_specialties for a fuzzy-matching specialty name, the advocate's city
+    // or a match on the first + last concatenated name.
     const filterSql = shouldFilter ? sql`
       WHERE a.id IN (
         SELECT a2.id
@@ -30,7 +33,7 @@ export async function GET(request: Request): Promise<Response> {
           OR s2.name ILIKE ${`%${searchTerm}%`}
       )
     ` : sql``
-    // Since Drizzle does not support aggregated selections, unfortunately we have to use raw SQL here
+    // Since Drizzle does not support native aggregates we have to use raw SQL here
     const results = await db.execute(
         sql`
             SELECT
