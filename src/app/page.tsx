@@ -2,58 +2,37 @@
 
 import AdvocateTable from "@/app/AdvocateTable";
 import useDebounce from "@/app/debounce";
-import {Advocate} from "@/app/types/model";
 import React from "react";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const [advocates, setAdvocates] = useState([]);
-  const [filteredAdvocates, setFilteredAdvocates] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    console.log("fetching advocates...");
-      const fetchAdvocates = async () => {
-          try {
-              const res = await fetch("/api/advocates");
-              const data = await res.json();
-              setAdvocates(data.data);
-              setFilteredAdvocates(data.data);
-          } catch (error) {
-              console.error("Error fetching advocates", error);
-          }
-      };
-
-      void fetchAdvocates();
+      searchFilteredAdvocates('')
   }, []);
 
   const searchFilteredAdvocates = (input: string) => {
-      const normalizedTerm = input.trim().toLowerCase();
-
-      const matches = (input: string, term: string): boolean => {
-          // This could be replaced with a regex, but that would require the input source to be sanitized from regex characters which is unknown.
-          const normalizedInput = input.trim().toLowerCase();
-          return normalizedInput.includes(term);
-      }
-      return advocates.filter((advocate: Advocate) => {
-          return (
-              matches((advocate.firstName + " " + advocate.lastName), normalizedTerm) ||
-              matches(advocate.city, normalizedTerm) ||
-              matches(advocate.degree, normalizedTerm) ||
-              advocate.specialties.some(specialty => matches(specialty, normalizedTerm)) ||
-              (!isNaN(parseInt(normalizedTerm, 10)) && advocate.yearsOfExperience >= parseInt(normalizedTerm, 10))
-          );
-      });
+      const fetchAdvocates = async () => {
+          const searchParams = new URLSearchParams({
+              searchTerm: input.toLowerCase().trim(),
+          }).toString()
+          const res = await fetch(`/api/advocates?${input.trim() ? searchParams : ''}`).catch((error: unknown) =>{
+              console.error("Error fetching advocates", error);
+          });
+          if(!res)
+              return
+          const data = await res.json();
+          setAdvocates(data.data);
+      };
+      void fetchAdvocates();
   }
 
-  // A delayed effect hook that will run after the user has stopped typing for 300ms or if the advocates list changes.
+  // A delayed effect hook that will run after the user has stopped typing for 300ms
   useDebounce(() =>{
-      if(searchTerm.trim().length === 0){
-          setFilteredAdvocates(advocates);
-          return;
-      }
-      setFilteredAdvocates(searchFilteredAdvocates(searchTerm));
-  }, [advocates, searchTerm], 300)
+      searchFilteredAdvocates(searchTerm);
+  }, [searchTerm], 300)
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement >) => {
     const term = e.target.value;
@@ -97,7 +76,7 @@ export default function Home() {
                   </p>
               )}
           </div>
-          <AdvocateTable advocates={filteredAdvocates}/>
+          <AdvocateTable advocates={advocates}/>
       </main>
   );
 }
